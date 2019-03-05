@@ -11,21 +11,22 @@ namespace App\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
-use App\Service\CSVImport;
+use App\Entity\ProductData;
 
 
 class ImportCsv extends Command
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'app:import-csv';
-    private  $import;
+    private  $container;
 
-    public function __construct(CSVImport $import)
+    public function __construct(ContainerInterface $container)
     {
-        $this->import = $import;
+        $this->container = $container;
 
         parent::__construct();
     }
@@ -49,12 +50,20 @@ class ImportCsv extends Command
     {
         // outputs multiple lines to the console (adding "\n" at the end of each line)
         $output->writeln([
-            'User Creator',
+            'Product Creator',
             '============',
             '',
         ]);
 
-        $output->writeln('Param: '. $input->getArgument('test_mode'));
+        if (!empty($input->getArgument('test_mode'))) {
+            $param = $input->getArgument('test_mode');
+            if ($param === 'test') {
+                $output->writeln('Warning! The script is running in test mode!');
+            } else {
+                $output->writeln('An invalid parameter was entered. Param: '. $input->getArgument('test_mode').' Pls, try again.');
+                return;
+            }
+        }
 
         // the value returned by someMethod() can be an iterator (https://secure.php.net/iterator)
         // that generates and returns the messages with the 'yield' PHP keyword
@@ -67,8 +76,26 @@ class ImportCsv extends Command
         }
 
         fclose($file);
+        $entityManager = $this->container->get('doctrine')->getManager();
+        $now = new \DateTime('now');
+        foreach ($csv as $val) {
+            $product = new ProductData();
+            $product->setStrProductName('Keyboard')
+                ->setIntProductPrice(2333)
+                ->setIntProductStock(5)
+                ->setStrProductDesc('Ergonomic and stylish!')
+                ->setStrProductCode('VO-7856')
+                ->setDtmAdded('2018-12-12 23:12:44')
+                ->setDtmDiscontinued($now->format('Y-m-d h:i:s'));
 
-        $output->writeln(print_r($csv));
+            // tell Doctrine you want to (eventually) save the Product (no queries yet)
+            $entityManager->persist($product);
+
+            // actually executes the queries (i.e. the INSERT query)
+            $entityManager->flush();
+        }
+
+        //$output->writeln(print_r($csv));
 
 
         // outputs a message followed by a "\n"
