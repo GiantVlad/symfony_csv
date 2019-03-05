@@ -1,8 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#apt-get update
-#apt-get install -y php7.2-mbstring php-xml
+$script = <<-SCRIPT
+    apt-get update && apt-get install -y php7.2-mbstring php7.2-xml php7.2-zip
+    cp /var/www/html/default /etc/nginx/sites-available/ &&\
+    chmod 0755 /etc/nginx/sites-available/default
+SCRIPT
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -69,8 +72,7 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
-  config.vm.provision "shell",
-      inline: "apt-get update && apt-get install -y php7.2-mbstring php7.2-xml"
+  config.vm.provision "shell", inline: $script
 
   config.vm.provision "shell",
     inline: "service nginx start", run: "always"

@@ -70,7 +70,7 @@ class ProductData
      *
      * @ORM\Column(name="stmTimestamp", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
-    private $stmTimestamp = 'CURRENT_TIMESTAMP';
+    private $stmTimestamp;
 
     public function getIntProductDataId(): ?int
     {
