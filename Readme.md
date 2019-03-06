@@ -17,3 +17,5 @@ For Vagrant:
   If table "tblProductData" does not exists, it will be created. And then the "strProductPrice" and "strProductStock" columns will be added.
 - Move your CSV file to "upload" folder, The file should be named 'stock.csv' and should contain this first header row: "Product Code,Product Name,Product Description,Stock,Cost in GBP,Discontinued"
 - Run "php bin/console app:import-csv" or "php bin/console app:import-csv test".
+
+The column "strProductPrice" is stored in the DB with the type "Integer" (price*100) to prevent round errors.  
