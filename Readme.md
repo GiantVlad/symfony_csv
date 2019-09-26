@@ -1,4 +1,4 @@
-<h3>Import CSV price-list to the DB</h3>
+<h3>Import CSV price-list into the DB</h3>
 
 <span>#php7 #Symfony4 #MySql</span>
 
